@@ -5,8 +5,51 @@ let map;
 let data_;
 let countries = [];
 let types = [];
-let modules = [];
 let toggle_ = false;
+let movs_;
+
+class MovilityList {
+    constructor (data){
+        this.movList = [];
+        for(let i = 0; i < data.length; i++){
+            this.movList.push(data[i]);
+        }
+    }
+
+    getMov(index){
+        return this.movList[index];
+    }
+
+    filterByCountry(country){
+        let auxList = [];
+        for(let i = 0; i < this.movList.length; i++){
+            if(this.movList[i].pais == country){
+                auxList.push(this.movList[i]);
+            }
+        }
+        return auxList;
+    }
+
+    filterByType(type){
+        let auxList = [];
+        for(let i = 0; i < this.movList.length; i++){
+            if(this.movList[i].tipo == type){
+                auxList.push(this.movList[i]);
+            }
+        }
+        return auxList;
+    }
+
+    filterByModule(ciclo){
+        let auxList = [];
+        for(let i = 0; i < this.movList.length; i++){
+            if(this.movList[i].ciclo == ciclo){
+                auxList.push(this.movList[i]);
+            }
+        }
+        return auxList;
+    }
+}
 
 function initMap() {
     map = new google.maps.Map(document.getElementById('map'), {
@@ -38,15 +81,13 @@ window.onload = function(){ //Lee el fichero json y lo parsea para guardarlo en 
 
  function initForm(){
      //Obtencion de datos
+     movs_ = new MovilityList(data_);
      for (let i = 0; i < data_.length; i++) {
          if(types.indexOf(data_[i].tipo) == -1){
              types.push(data_[i].tipo);
             }
             if(countries.indexOf(data_[i].pais) == -1){
                 countries.push(data_[i].pais);
-            }
-            if(modules.indexOf(data_[i].ciclo) == -1){
-                modules.push(data_[i].ciclo);
             }
         }
         
@@ -67,7 +108,7 @@ window.onload = function(){ //Lee el fichero json y lo parsea para guardarlo en 
         let input = document.createElement("input");
         input.type = "checkbox";
         input.className = "form-check-input country";
-        input.id = "country" + i;
+        input.id = "check" + i;
         input.value = countries[i];
         label.appendChild(input);
         let text = document.createTextNode(countries[i]);
@@ -77,11 +118,24 @@ window.onload = function(){ //Lee el fichero json y lo parsea para guardarlo en 
 
     //Ciclos
     let modulesSelect = document.getElementById("moduleSelect");
-    for(let i = 0; i < modules.length; i++){
-        let option = document.createElement("option");
-        option.textContent = modules[i];
-        option.value = modules[i];
-        moduleSelect.appendChild(option);
+    let modules = [];
+    for(let i = 0; i < movs_.movList.length; i++){
+        if(modules.indexOf(movs_.movList[i].ciclo) == -1){
+            let option = document.createElement("option");
+            option.textContent = movs_.movList[i].ciclo;
+            option.value = movs_.movList[i].ciclo;
+            if(movs_.movList[i].tipo == "Grado Superior"){
+                option.className = "GS";
+            }
+            if(movs_.movList[i].tipo == "Grado Medio"){
+                option.className = "GM";
+            }
+            if(movs_.movList[i].tipo == "Profesorado"){
+                option.className = "PR";
+            }
+            moduleSelect.appendChild(option);
+            modules.push(movs_.movList[i].ciclo);
+        }
     }
  }
 
@@ -109,6 +163,52 @@ function typeChange(){
             document.getElementById("countriesButtons").style.display = "none";            
             document.getElementById("countries").style.display = "none";            
             document.getElementById("modules").style.display = "initial";
+        }
+    }
+    if(toggle_ == false){
+        if(select.value == "Grado Medio"){
+            changeModules("GM");
+        }
+        if(select.value == "Grado Superior"){
+            changeModules("GS");
+        }
+        if(select.value == "Profesorado"){
+            changeModules("PR");
+        }
+    }
+    else{
+        changeCountries();
+    }
+}
+
+function changeModules(value){
+    let select = document.getElementById("moduleSelect");        
+    let options = document.querySelectorAll("#moduleSelect > option");
+    let aux = document.querySelectorAll("." + value);
+    for(let i = 0; i < options.length; i++){
+        options[i].style.display = "none";
+    }
+    for(let i = 0; i < aux.length; i++){
+        aux[i].style.display = "initial";
+    }
+    select.selectedIndex = 0;
+}
+
+function changeCountries(){
+    let select = document.getElementById("typeSelect");    
+    let auxMovs = new MovilityList(movs_.filterByType(select.value));
+    let checkboxes = document.querySelectorAll(".country");
+    for(let i = 0; i < checkboxes.length; i++){
+        checkboxes[i].parentElement.style.display = "none";
+    }
+    for(let i = 0; i < countries.length; i++){
+        let auxList = auxMovs.filterByCountry(countries[i]);
+        if(auxList.length > 0){
+            for(let j = 0; j < checkboxes.length; j++){
+                if(checkboxes[j].value == countries[i]){
+                    checkboxes[j].parentElement.style.display = "initial";
+                }
+            }
         }
     }
 }
