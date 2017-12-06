@@ -16,9 +16,6 @@
             <div class="col-xs-6" align="center">
                 <select name="type" id="typeSelect">
                     <option value="ALL">Todos</option>
-                    <option value="GS">Grado Superior</option>
-                    <option value="GM">Grado Medio</option>
-                    <option value="PROF">Profesorado</option>
                 </select>
             </div>
             <div class="col-xs-6 toggle" align="center">
@@ -26,44 +23,16 @@
                     <label for="checktoggle"></label><span>Paises</span> 
             </div>
             <div class="col-xs-12" align="center" id="countriesButtons">
-                <button>Seleccionar todos</button>
-                <button>Deseleccionar todos</button>                
+                <button id="check">Seleccionar todos</button>
+                <button id="uncheck">Deseleccionar todos</button>                
             </div>
             <div class="col-xs-12" align="center" id="countries">
-                <div class="form-check form-check-inline">
-                    <label class="form-check-label">
-                        <input class="form-check-input" type="checkbox" id="inlineCheckbox1" value="option1"> Polonia
-                    </label>
-
-                    <label class="form-check-label">
-                            <input class="form-check-input" type="checkbox" id="inlineCheckbox2" value="option2"> Polonia
-                    </label>
-
-                    <label class="form-check-label">
-                            <input class="form-check-input" type="checkbox" id="inlineCheckbox3" value="option2"> Polonia
-                    </label>
-
-                    <label class="form-check-label">
-                            <input class="form-check-input" type="checkbox" id="inlineCheckbox4" value="option2"> Polonia
-                    </label>
-
-                    <label class="form-check-label">
-                            <input class="form-check-input" type="checkbox" id="inlineCheckbox5" value="option2"> Polonia
-                    </label>
-
-                    <label class="form-check-label">
-                            <input class="form-check-input" type="checkbox" id="inlineCheckbox6" value="option2"> Polonia
-                    </label>
-
-                    <label class="form-check-label">
-                            <input class="form-check-input" type="checkbox" id="inlineCheckbox7" value="option2"> Polonia
-                    </label>
-
-                    <label class="form-check-label">
-                            <input class="form-check-input" type="checkbox" id="inlineCheckbox8" value="option2"> Polonia
-                    </label>
-                </div>
+                <div class="form-check form-check-inline" id="countriesInputs"></div>
             </div>
+
+            <div class="col-xs-12" align="center" id="modules">
+                <select name="module" id="moduleSelect"></select>
+            </div>   
 
             <div class="col-xs-12" align="center">
                 <button>Buscar en el mapa</button>

@@ -8,16 +8,35 @@ html, body {
 }
 
 #form {
-    margin-top: 5%;
+    margin-top: 3%;
 }
 div{
     margin-bottom: 2%;
 }
 
 #map {
-    height: 70vh;
+    height: 68vh;
     width: 90vw;
+    margin-bottom: 0;
 }
+
+#countriesInputs label{
+    padding-right: 3%;
+}
+
+#countries{
+    display: none;
+}
+
+#countriesButtons{
+    display: none;
+}
+
+#modules{
+    display: none;
+}
+
+
 
 .toggle {
     position: relative;
