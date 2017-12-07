@@ -1,12 +1,17 @@
 //Clave maps : AIzaSyAww3Txk8R0wzgSvtIgf_hsgBbbFeJlxAE
 //Clave geocoding : AIzaSyDY6jBx513uHdlLA9wa-7r0KZirNLsfw6M
-
+//Clave maps2: AIzaSyCpiCRGo5cM_NdplMhl9oR1AIdri8tLaXo
+//clave geocoding2: AIzaSyCRBsKc1kgrlZ9Lr77ZHiCWISrvKUjJv4o
 let map;
 let data_;
 let countries = [];
 let types = [];
 let toggle_ = false;
 let movs_;
+let labelCount = 1;
+let xhttp = new XMLHttpRequest();
+let cityCoords = [];
+
 
 class MovilityList {
     constructor (data){
@@ -56,6 +61,44 @@ function initMap() {
         center: {lat: 55.0189645, lng: 15.22315479 },
         zoom: 3
     });
+
+    xhttp.onreadystatechange = processResult;
+}
+
+function addMarker(latlng){
+    let marker = new google.maps.Marker({
+        label:{
+         text: labelCount.toString(),
+         fontWeigth: 999,
+        },    
+        position: latlng,
+        map: map,
+        title: 'Hello World!'
+      });
+    labelCount++;
+}
+
+function processResult() {
+    console.log("readyState: " + xhttp.readyState);
+    console.log("status: " + xhttp.status);
+
+    if (xhttp.readyState === 4 && xhttp.status === 200) {
+        let response = JSON.parse(xhttp.responseText);
+        console.log(response);
+        aux = {
+            name: response.results["0"].address_components["0"].long_name,
+            latlng: response.results["0"].geometry.location
+        };
+        cityCoords.push(aux);
+        console.log(cityCoords);
+        addMarker(aux.latlng);
+    }
+}
+
+function getAddress(address){
+    var addr = address.replace(" ","+");
+    xhttp.open("GET","https://maps.googleapis.com/maps/api/geocode/json?address=" + addr + "&key=AIzaSyCRBsKc1kgrlZ9Lr77ZHiCWISrvKUjJv4o", true);
+    xhttp.send();
 }
 
 
@@ -144,10 +187,12 @@ function initListeners(){
     let checktoggle = document.getElementById("checktoggle");    
     let check = document.getElementById("check");
     let uncheck = document.getElementById("uncheck");
+    let searchButton = document.getElementById("searchButton");
     select.addEventListener("change", typeChange, false);
     checktoggle.addEventListener("change", toggleChange, false);
     check.addEventListener("click", checkAll, false);
     uncheck.addEventListener("click", uncheckAll, false);
+    searchButton.addEventListener("click", searchInMap, false);
     
 }
 
@@ -239,3 +284,13 @@ function uncheckAll(){
         countryChecks[i].checked = false;
     }
 }
+
+
+/////Hace un bucle infinito NO USAR
+function searchInMap(list, it, callback){ 
+    if(it < list.length){
+        getAddress(movs_.movList[it].ciudad + " " + movs_.movList[it].pais);
+        callback(list, it++, callback);
+    }
+}
+///
