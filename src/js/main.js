@@ -96,7 +96,7 @@ function processResult() {
 }
 
 function getAddress(address){
-    var addr = address.replace(" ","+");
+    var addr = address.split(" ").join("+");
     xhttp.open("GET","https://maps.googleapis.com/maps/api/geocode/json?address=" + addr + "&key=AIzaSyCRBsKc1kgrlZ9Lr77ZHiCWISrvKUjJv4o", true);
     xhttp.send();
 }
@@ -286,11 +286,33 @@ function uncheckAll(){
 }
 
 
-/////Hace un bucle infinito NO USAR
-function searchInMap(list, it, callback){ 
-    if(it < list.length){
-        getAddress(movs_.movList[it].ciudad + " " + movs_.movList[it].pais);
-        callback(list, it++, callback);
+var auxNum = 0;
+function searchinMap(list) {
+    if (auxNum >= list.length) {
+        auxNum = 0;
+        return;
     }
+
+    var req = new XMLHttpRequest();
+
+    req.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            let response = JSON.parse(this.responseText);
+            console.log(response);
+            let aux = {
+                name: response.results["0"].address_components["0"].long_name,
+                latlng: response.results["0"].geometry.location
+            };
+            cityCoords.push(aux);
+            console.log(cityCoords);
+            addMarker(aux.latlng);
+
+            auxFunc(list, auxNum++);
+        }
+    }
+
+    var address = list[auxNum].ciudad + " " + list[auxNum].pais;
+    address = address.split(" ").join("+");
+    req.open("GET","https://maps.googleapis.com/maps/api/geocode/json?address=" + address + "&key=AIzaSyCRBsKc1kgrlZ9Lr77ZHiCWISrvKUjJv4o", true);
+    req.send();
 }
-///
