@@ -361,8 +361,8 @@ function searchinMap(list) {
             cityCoords.push(aux);
             console.log(cityCoords);
             addMarker(aux.latlng);
-
-            auxFunc(list, auxNum++);
+            auxNum++
+            searchinMap(list);
         }
     };
 
