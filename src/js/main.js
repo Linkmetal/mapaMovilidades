@@ -35,6 +35,18 @@ class MovilityList {
         return auxList;
     }
 
+    filterByCountries(countries){
+        let auxList = [];
+        for(let j = 0; j < countries.length; j++){
+            for(let i = 0; i < this.movList.length; i++){
+                if(this.movList[i].pais == countries[j].value){
+                    auxList.push(this.movList[i]);
+                }
+            }
+        }
+        return auxList;
+    }
+
     filterByType(type){
         let auxList = [];
         for(let i = 0; i < this.movList.length; i++){
@@ -150,6 +162,7 @@ window.onload = function(){ //Lee el fichero json y lo parsea para guardarlo en 
         label.className = "form-check-label";
         let input = document.createElement("input");
         input.type = "checkbox";
+        input.checked = true;
         input.className = "form-check-input country";
         input.id = "check" + i;
         input.value = countries[i];
@@ -183,16 +196,24 @@ window.onload = function(){ //Lee el fichero json y lo parsea para guardarlo en 
  }
 
 function initListeners(){
-    let select = document.getElementById("typeSelect");
+    let typeSelect = document.getElementById("typeSelect");
+    let moduleSelect = document.getElementById("moduleSelect");    
     let checktoggle = document.getElementById("checktoggle");    
     let check = document.getElementById("check");
     let uncheck = document.getElementById("uncheck");
     let searchButton = document.getElementById("searchButton");
-    select.addEventListener("change", typeChange, false);
+    let countriesInputs = document.querySelectorAll("#countriesInputs input");
+    typeSelect.addEventListener("change", typeChange, false);
+    moduleSelect.addEventListener("change", moduleChange, false);   
     checktoggle.addEventListener("change", toggleChange, false);
     check.addEventListener("click", checkAll, false);
     uncheck.addEventListener("click", uncheckAll, false);
-    searchButton.addEventListener("click", searchInMap, false);
+    searchButton.addEventListener("click", function() {
+        searchinMap(movs_.movList);
+    }, false);
+    for(let i = 0; i < countriesInputs.length; i++){
+        countriesInputs[i].addEventListener("change", countryChange, false);
+    }
     
 }
 
@@ -210,16 +231,24 @@ function typeChange(){
             document.getElementById("modules").style.display = "initial";
         }
     }
+    movs_ = new MovilityList(data_); //reseteo de lista de movilidades
+    let typeCode = ""; 
+
+    //Filtra la lista de movilidades segun el valor seleccionado
+    if(select.value == "Grado Medio"){
+        typeCode = "GM";
+    }
+    if(select.value == "Grado Superior"){
+        typeCode = "GS";              
+    }
+    if(select.value == "Profesorado"){
+        typeCode = "PR";        
+    }
+    
+    movs_.movList = movs_.filterByType(select.value);
+
     if(toggle_ == false){
-        if(select.value == "Grado Medio"){
-            changeModules("GM");
-        }
-        if(select.value == "Grado Superior"){
-            changeModules("GS");
-        }
-        if(select.value == "Profesorado"){
-            changeModules("PR");
-        }
+        changeModules(typeCode);
     }
     else{
         changeCountries();
@@ -245,6 +274,7 @@ function changeCountries(){
     let checkboxes = document.querySelectorAll(".country");
     for(let i = 0; i < checkboxes.length; i++){
         checkboxes[i].parentElement.style.display = "none";
+        checkboxes[i].checked = false;
     }
     for(let i = 0; i < countries.length; i++){
         let auxList = auxMovs.filterByCountry(countries[i]);
@@ -252,9 +282,23 @@ function changeCountries(){
             for(let j = 0; j < checkboxes.length; j++){
                 if(checkboxes[j].value == countries[i]){
                     checkboxes[j].parentElement.style.display = "initial";
+                    checkboxes[j].checked = true;
                 }
             }
         }
+    }
+}
+
+function moduleChange(){
+    let typeSelect = document.getElementById("typeSelect");
+    let moduleSelect = document.getElementById("moduleSelect");
+    movs_ = new MovilityList(data_);
+    if(typeSelect.selectedIndex == 0){
+        movs_.movList = movs_.filterByType(typeSelect.value);        
+    }
+    else{
+        movs_.movList = movs_.filterByType(typeSelect.value);
+        movs_.movList = movs_.filterByModule(moduleSelect.value);
     }
 }
 
@@ -269,6 +313,17 @@ function toggleChange(){
         toggle_ = false;
     }
     typeChange();
+}
+
+function countryChange() {
+    let typeSelect = document.getElementById("typeSelect");
+    movs_ = new MovilityList(data_);
+    movs_.movList = movs_.filterByType(typeSelect.value);            
+    let selectedCountries = document.querySelectorAll("#countriesInputs input[type='checkbox']:checked");
+    if(selectedCountries.length != 0){
+        movs_.movList = movs_.filterByCountries(selectedCountries);
+    }
+    console.log(movs_.movList);
 }
 
 function checkAll(){
@@ -298,7 +353,10 @@ function searchinMap(list) {
     req.onreadystatechange = function() {
         if (this.readyState == 4 && this.status == 200) {
             let response = JSON.parse(this.responseText);
+<<<<<<< b2fd8bf188cef901d2f3579cfa4c39f2c97e80b1
             console.log(response);
+=======
+>>>>>>> d5081a981002bdb82188617d4c5e3e3995c0b6b6
             let aux = {
                 name: response.results["0"].address_components["0"].long_name,
                 latlng: response.results["0"].geometry.location
@@ -306,10 +364,17 @@ function searchinMap(list) {
             cityCoords.push(aux);
             console.log(cityCoords);
             addMarker(aux.latlng);
+<<<<<<< b2fd8bf188cef901d2f3579cfa4c39f2c97e80b1
 
             auxFunc(list, auxNum++);
         }
     }
+=======
+            auxNum++;
+            searchinMap(list);
+        }
+    };
+>>>>>>> d5081a981002bdb82188617d4c5e3e3995c0b6b6
 
     var address = list[auxNum].ciudad + " " + list[auxNum].pais;
     address = address.split(" ").join("+");
