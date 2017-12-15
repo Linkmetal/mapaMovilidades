@@ -353,10 +353,7 @@ function searchinMap(list) {
     req.onreadystatechange = function() {
         if (this.readyState == 4 && this.status == 200) {
             let response = JSON.parse(this.responseText);
-<<<<<<< b2fd8bf188cef901d2f3579cfa4c39f2c97e80b1
             console.log(response);
-=======
->>>>>>> d5081a981002bdb82188617d4c5e3e3995c0b6b6
             let aux = {
                 name: response.results["0"].address_components["0"].long_name,
                 latlng: response.results["0"].geometry.location
@@ -364,17 +361,10 @@ function searchinMap(list) {
             cityCoords.push(aux);
             console.log(cityCoords);
             addMarker(aux.latlng);
-<<<<<<< b2fd8bf188cef901d2f3579cfa4c39f2c97e80b1
 
             auxFunc(list, auxNum++);
         }
-    }
-=======
-            auxNum++;
-            searchinMap(list);
-        }
     };
->>>>>>> d5081a981002bdb82188617d4c5e3e3995c0b6b6
 
     var address = list[auxNum].ciudad + " " + list[auxNum].pais;
     address = address.split(" ").join("+");
