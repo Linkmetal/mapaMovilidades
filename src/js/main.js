@@ -11,6 +11,10 @@ let movs_;
 let labelCount = 1;
 let xhttp = new XMLHttpRequest();
 let cityCoords = [];
+let infowindow;
+let markers = [];
+let markerCluster;
+let infoWindows = [];
 
 
 class MovilityList {
@@ -74,20 +78,44 @@ function initMap() {
         zoom: 3
     });
 
+    var mc =window.MarkerClusterer.prototype.onRemove = function(){
+        for ( var i = 0 ; i < this.clusters_.length; i++){
+        this.clusters_[i].remove()
+        }
+    }
     xhttp.onreadystatechange = processResult;
 }
 
-function addMarker(latlng){
+function addMarker(latlng, it){
+    contentString = "<h4>Datos de la movilidad</h3><ul><li><b>Tipo:</b> " + movs_.movList[it].tipo + "</li><li><b>Ciclo:</b> " + movs_.movList[it].ciclo + "</li><li><b>País:</b> " + movs_.movList[it].pais + "</li><li><b>Ciudad:</b> " + movs_.movList[it].ciudad + "</li></ul>"; 
+    var infowindow = new google.maps.InfoWindow({
+        content: contentString,
+    });
+    infoWindows.push(infowindow);
     let marker = new google.maps.Marker({
-        label:{
-         text: labelCount.toString(),
-         fontWeigth: 999,
-        },    
+        id: labelCount.toString(),    
+        animation: google.maps.Animation.DROP,
         position: latlng,
         map: map,
         title: 'Hello World!'
       });
     labelCount++;
+    markers.push(marker);
+    marker.addListener('click', function() {
+        infoWindows[parseInt(marker.id) - 1].open(map, marker);
+    });
+}
+
+function deleteMarkers(){
+    if(markerCluster != null){
+        markerCluster.clearMarkers();
+    }
+    for (var i = 0; i < markers.length; i++ ) {
+        markers[i].setMap(null);
+    }
+    markers.length = 0;
+    labelCount = 1;
+    cityCoords = [];
 }
 
 function processResult() {
@@ -343,7 +371,12 @@ function uncheckAll(){
 
 var auxNum = 0;
 function searchinMap(list) {
+    if(auxNum == 0){
+        deleteMarkers();
+    }
     if (auxNum >= list.length) {
+        markerCluster = new MarkerClusterer(map, markers,
+            {imagePath: 'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m'});
         auxNum = 0;
         return;
     }
@@ -359,9 +392,10 @@ function searchinMap(list) {
                 latlng: response.results["0"].geometry.location
             };
             cityCoords.push(aux);
+            aux = fixPosition(aux);
             console.log(cityCoords);
-            addMarker(aux.latlng);
-            auxNum++
+            addMarker(aux.latlng, auxNum);
+            auxNum++;
             searchinMap(list);
         }
     };
@@ -370,4 +404,17 @@ function searchinMap(list) {
     address = address.split(" ").join("+");
     req.open("GET","https://maps.googleapis.com/maps/api/geocode/json?address=" + address + "&key=AIzaSyCRBsKc1kgrlZ9Lr77ZHiCWISrvKUjJv4o", true);
     req.send();
+}
+
+function fixPosition(mov){
+    let coincidences = 0;
+    for(let i = 0; i < cityCoords.length; i++){
+        if(aux = cityCoords[i]){
+            coincidences++;
+        }
+    }
+
+    mov.latlng.lat = mov.latlng.lat - (coincidences / 5000);
+
+    return mov;
 }
