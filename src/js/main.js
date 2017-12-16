@@ -80,9 +80,9 @@ function initMap() {
 
     var mc =window.MarkerClusterer.prototype.onRemove = function(){
         for ( var i = 0 ; i < this.clusters_.length; i++){
-        this.clusters_[i].remove()
+        this.clusters_[i].remove();
         }
-    }
+    };
     xhttp.onreadystatechange = processResult;
 }
 
